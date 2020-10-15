@@ -13,6 +13,7 @@ export default class Site extends App {
       authCallbackRoute: '/api/create-github-access-token',
       clientId: process.env.GITHUB_CLIENT_ID,
       baseRepoFullName: process.env.REPO_FULL_NAME, // e.g: tinacms/tinacms.org,
+      authScope: 'repo'
     })
 
     /**
