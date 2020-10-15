@@ -60,6 +60,7 @@ export const getStaticProps: GetStaticProps = async function({preview, previewDa
 
   return {
     props: { 
+      allPosts,
       sourceProvider: null,
       error: null,
       preview: false,
