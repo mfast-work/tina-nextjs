@@ -9,11 +9,21 @@ import { CMS_NAME } from '../lib/constants'
 import { getGithubPreviewProps, parseJson } from 'next-tinacms-github'
 import { GetStaticProps } from 'next'
 import preview from './api/preview'
+import { usePlugin } from 'tinacms'
+import { useGithubJsonForm, useGithubToolbarPlugins, } from 'react-tinacms-github'
 
-export default function Index({ allPosts, file }) {
-  const heroPost = allPosts[0]
-  const morePosts = allPosts.slice(1)
-  const data = file.data
+
+export default function Index({ file }) {
+  //const heroPost = allPosts[0]
+  //const morePosts = allPosts.slice(1)
+  const formOptions = {
+    label: 'Home Page',
+    fields: [{ name: 'title', component: 'text' }],
+  }
+
+    const [data, form] = useGithubJsonForm(file, formOptions)
+    usePlugin(form)
+    useGithubToolbarPlugins()
 
   return (
     <>
@@ -23,7 +33,8 @@ export default function Index({ allPosts, file }) {
         </Head>
         <Container>
           <Intro />
-          {heroPost && (
+          {data.title}
+          {/* {heroPost && (
             <HeroPost
               title={heroPost.title}
               coverImage={heroPost.coverImage}
@@ -33,7 +44,7 @@ export default function Index({ allPosts, file }) {
               excerpt={heroPost.excerpt}
             />
           )}
-          {morePosts.length > 0 && <MoreStories posts={morePosts} />}
+          {morePosts.length > 0 && <MoreStories posts={morePosts} />} */}
         </Container>
       </Layout>
     </>
@@ -49,18 +60,9 @@ export const getStaticProps: GetStaticProps = async function({preview, previewDa
     })
   }
   
-  const allPosts = getAllPosts([
-    'title',
-    'date',
-    'slug',
-    'author',
-    'coverImage',
-    'excerpt',
-  ])
 
   return {
     props: { 
-      allPosts,
       sourceProvider: null,
       error: null,
       preview: false,
