@@ -6,15 +6,20 @@ import Layout from '../components/layout'
 import { getAllPosts } from '../lib/api'
 import Head from 'next/head'
 import { CMS_NAME } from '../lib/constants'
+import { getGithubPreviewProps, parseJson } from 'next-tinacms-github'
+import { GetStaticProps } from 'next'
+import preview from './api/preview'
 
-export default function Index({ allPosts }) {
+export default function Index({ allPosts, file }) {
   const heroPost = allPosts[0]
   const morePosts = allPosts.slice(1)
+  const data = file.data
+
   return (
     <>
-      <Layout>
+      <Layout preview={preview}>
         <Head>
-          <title>Next.js Blog Example with {CMS_NAME}</title>
+          {data.title}
         </Head>
         <Container>
           <Intro />
@@ -35,7 +40,15 @@ export default function Index({ allPosts }) {
   )
 }
 
-export async function getStaticProps() {
+export const getStaticProps: GetStaticProps = async function({preview, previewData}) {
+  if (preview) {
+    return getGithubPreviewProps({
+      ...previewData,
+      fileRelativePath: 'content/home.json',
+      parse: parseJson,
+    })
+  }
+  
   const allPosts = getAllPosts([
     'title',
     'date',
@@ -46,6 +59,13 @@ export async function getStaticProps() {
   ])
 
   return {
-    props: { allPosts },
+    props: { 
+      sourceProvider: null,
+      error: null,
+      preview: false,
+      file: {
+        fileRelativePath: 'content/home.json',
+        data: (await import('../content/home.json')).default, },
+    }
   }
 }
