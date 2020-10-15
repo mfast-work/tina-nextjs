@@ -10,12 +10,38 @@ import PostTitle from '../../components/post-title'
 import Head from 'next/head'
 import { CMS_NAME } from '../../lib/constants'
 import markdownToHtml from '../../lib/markdownToHtml'
+import { useForm, usePlugin } from 'tinacms'
 
-export default function Post({ post, morePosts, preview }) {
+
+export default function Post({ post: initialPost, morePosts, preview }) {
   const router = useRouter()
-  if (!router.isFallback && !post?.slug) {
+  if (!router.isFallback && !initialPost?.slug) {
     return <ErrorPage statusCode={404} />
   }
+  
+  const formConfig = {
+      id: initialPost.slug,
+      label: 'Blog Post',
+      initialValues: initialPost,
+      onSubmit: (values) => {
+        alert(`Submitting ${values.title}`)
+      },
+      fields: [
+        {
+          name: 'title',
+          label: 'Post Title',
+          component: 'text',
+        },
+        {
+          name: 'rawMarkdownBody',
+          label: 'Content',
+          component: 'markdown',
+        },
+      ],
+    }
+  const [post, form] = useForm(formConfig)
+  usePlugin(form)
+
   return (
     <Layout preview={preview}>
       <Container>
@@ -56,14 +82,11 @@ export async function getStaticProps({ params }) {
     'ogImage',
     'coverImage',
   ])
-  const content = await markdownToHtml(post.content || '')
+  
 
   return {
     props: {
-      post: {
-        ...post,
-        content,
-      },
+      post,
     },
   }
 }
