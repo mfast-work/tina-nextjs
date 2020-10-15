@@ -1,6 +1,8 @@
 import App from 'next/app'
 import { TinaCMS, TinaProvider,  } from 'tinacms'
+import { MarkdownFieldPlugin } from 'react-tinacms-editor'
 import { GithubClient, TinacmsGithubProvider, GithubMediaStore } from 'react-tinacms-github'
+import '../styles/index.css'
 
 export default class Site extends App {
   cms: TinaCMS
@@ -34,8 +36,10 @@ export default class Site extends App {
       /**
        * 4. Use the Sidebar and Toolbar
        */
+      plugins: [MarkdownFieldPlugin],
       sidebar: props.pageProps.preview,
       toolbar: props.pageProps.preview,
+      
     })
   }
 
